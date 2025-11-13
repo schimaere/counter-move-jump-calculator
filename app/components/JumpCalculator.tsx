@@ -25,7 +25,8 @@ export default function JumpCalculator() {
       return null;
     }
 
-    const timeInFlight = frames / fps;
+    const timeInFlight = frames / fps; // in seconds
+    const timeInFlightMs = timeInFlight * 1000; // convert to milliseconds
 
     // Calculate jump height based on time in flight
     // Formula: h = (1/8) * g * t²
@@ -41,14 +42,37 @@ export default function JumpCalculator() {
     // The time to reach peak is half the total flight time
     const takeoffVelocity = gravity * (timeInFlight / 2);
 
+    // Calculate average force (Fm) using work-energy principle
+    // Formula: F_avg = m * g + (m * v²) / (2 * d)
+    // where m = body weight (kg), g = 9.81 m/s², v = takeoff velocity, d = countermovement depth
+    // Countermovement depth is estimated as 35% of leg length
+    const isValidWeight =
+      !isNaN(weight) && bodyWeight.trim() !== "" && weight > 0;
+    const isValidLegLength =
+      !isNaN(legLen) && legLength.trim() !== "" && legLen > 0;
+
+    let averageForce: number | null = null;
+    if (isValidWeight && isValidLegLength) {
+      const countermovementDepthMeters = (legLen / 100) * 0.35; // 35% of leg length in meters
+      const averageForceN =
+        weight * gravity +
+        (weight * takeoffVelocity * takeoffVelocity) /
+          (2 * countermovementDepthMeters);
+      averageForce = averageForceN;
+    }
+
     const results: {
       timeInFlight: number;
+      timeInFlightMs: number;
       jumpHeight: number;
       takeoffVelocity: number;
+      averageForce: number | null;
     } = {
       timeInFlight,
+      timeInFlightMs,
       jumpHeight: jumpHeightCm,
       takeoffVelocity,
+      averageForce,
     };
 
     return results;
@@ -164,7 +188,7 @@ export default function JumpCalculator() {
               {results ? (
                 <>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {results.timeInFlight.toFixed(2)} seconds
+                    {results.timeInFlightMs.toFixed(2)} ms
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     (frames ÷ fps)
@@ -215,6 +239,28 @@ export default function JumpCalculator() {
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">
                   Enter Frames per Second and Amount of Frames
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Average Force (Fm)
+            </label>
+            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+              {results && results.averageForce !== null ? (
+                <>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    {results.averageForce.toFixed(2)} N
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    (calculated from body weight, takeoff velocity, and leg
+                    length)
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">
+                  Enter Body Weight and Leg Length to calculate
                 </p>
               )}
             </div>
