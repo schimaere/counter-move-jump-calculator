@@ -45,20 +45,30 @@ export default function JumpCalculator() {
     // Calculate average force (Fm) using work-energy principle
     // Formula: F_avg = m * g + (m * v²) / (2 * d)
     // where m = body weight (kg), g = 9.81 m/s², v = takeoff velocity, d = countermovement depth
-    // Countermovement depth is estimated as 35% of leg length
+    // Countermovement depth (d) = leg length (standing) - hip height (at 90 degrees)
     const isValidWeight =
       !isNaN(weight) && bodyWeight.trim() !== "" && weight > 0;
     const isValidLegLength =
       !isNaN(legLen) && legLength.trim() !== "" && legLen > 0;
+    const isValidHeight90 =
+      !isNaN(height90) && height90Degree.trim() !== "" && height90 > 0;
 
     let averageForce: number | null = null;
-    if (isValidWeight && isValidLegLength) {
-      const countermovementDepthMeters = (legLen / 100) * 0.35; // 35% of leg length in meters
-      const averageForceN =
-        weight * gravity +
-        (weight * takeoffVelocity * takeoffVelocity) /
-          (2 * countermovementDepthMeters);
-      averageForce = averageForceN;
+    let relativeForce: number | null = null;
+    if (isValidWeight && isValidLegLength && isValidHeight90) {
+      // Countermovement depth = leg length (standing) - hip height (at 90 degrees)
+      const countermovementDepthCm = legLen - height90;
+      if (countermovementDepthCm > 0) {
+        const countermovementDepthMeters = countermovementDepthCm / 100; // Convert cm to meters
+        const averageForceN =
+          weight * gravity +
+          (weight * takeoffVelocity * takeoffVelocity) /
+            (2 * countermovementDepthMeters);
+        averageForce = averageForceN;
+        // Relative force = average force / (9.81 * body weight)
+        // This gives the force as a multiple of body weight (dimensionless)
+        relativeForce = averageForceN / (gravity * weight);
+      }
     }
 
     const results: {
@@ -67,12 +77,14 @@ export default function JumpCalculator() {
       jumpHeight: number;
       takeoffVelocity: number;
       averageForce: number | null;
+      relativeForce: number | null;
     } = {
       timeInFlight,
       timeInFlightMs,
       jumpHeight: jumpHeightCm,
       takeoffVelocity,
       averageForce,
+      relativeForce,
     };
 
     return results;
@@ -254,13 +266,37 @@ export default function JumpCalculator() {
                     {results.averageForce.toFixed(2)} N
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    (calculated from body weight, takeoff velocity, and leg
-                    length)
+                    (calculated from body weight, takeoff velocity, leg length,
+                    and hip height at 90 degrees)
                   </p>
                 </>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">
-                  Enter Body Weight and Leg Length to calculate
+                  Enter Body Weight, Leg Length, and Height with 90 Degree to
+                  calculate
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Relative Force (Frel)
+            </label>
+            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+              {results && results.relativeForce !== null ? (
+                <>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    {results.relativeForce.toFixed(3)}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    (average force divided by body weight × 9.81, multiple of
+                    body weight)
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">
+                  Enter Body Weight, Leg Length, and Height with 90 Degree to
+                  calculate
                 </p>
               )}
             </div>
