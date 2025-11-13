@@ -1,40 +1,60 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
 export default function JumpCalculator() {
-  const [framesPerSecond, setFramesPerSecond] = useState<string>('')
-  const [amountOfFrames, setAmountOfFrames] = useState<string>('')
-  const [bodyWeight, setBodyWeight] = useState<string>('')
-  const [legLength, setLegLength] = useState<string>('')
-  const [height90Degree, setHeight90Degree] = useState<string>('')
+  const [framesPerSecond, setFramesPerSecond] = useState<string>("");
+  const [amountOfFrames, setAmountOfFrames] = useState<string>("");
+  const [bodyWeight, setBodyWeight] = useState<string>("");
+  const [legLength, setLegLength] = useState<string>("");
+  const [height90Degree, setHeight90Degree] = useState<string>("");
 
   const calculate = () => {
-    const fps = parseFloat(framesPerSecond)
-    const frames = parseFloat(amountOfFrames)
-    const weight = parseFloat(bodyWeight)
-    const legLen = parseFloat(legLength)
-    const height90 = parseFloat(height90Degree)
+    const fps = parseFloat(framesPerSecond);
+    const frames = parseFloat(amountOfFrames);
+    const weight = parseFloat(bodyWeight);
+    const legLen = parseFloat(legLength);
+    const height90 = parseFloat(height90Degree);
 
-    if (!fps || !frames || !weight || !legLen || !height90) {
-      return null
+    // Check if fps and frames are valid numbers
+    const isValidFps = !isNaN(fps) && framesPerSecond.trim() !== "" && fps > 0;
+    const isValidFrames = !isNaN(frames) && amountOfFrames.trim() !== "";
+
+    // Time in flight calculation: amount of frames / frames per second = time in seconds
+    if (!isValidFps || !isValidFrames) {
+      return null;
     }
 
-    // Calculate time in seconds
-    const timeInSeconds = frames / fps
+    const timeInFlight = frames / fps;
 
-    // Calculate jump height based on physics
-    // Using kinematic equations and biomechanics
-    const results = {
-      timeInSeconds,
-      jumpHeight: height90,
-      // Add more calculations as needed
-    }
+    // Calculate jump height based on time in flight
+    // Formula: h = (1/8) * g * t²
+    // where g = 9.81 m/s² (gravity) and t = time in flight
+    // Result in meters, convert to cm by multiplying by 100
+    const gravity = 9.81; // m/s²
+    const jumpHeightMeters = (1 / 8) * gravity * timeInFlight * timeInFlight;
+    const jumpHeightCm = jumpHeightMeters * 100;
 
-    return results
-  }
+    // Calculate takeoff velocity based on time in flight
+    // Formula: v0 = g * (t / 2)
+    // where g = 9.81 m/s² and t = time in flight
+    // The time to reach peak is half the total flight time
+    const takeoffVelocity = gravity * (timeInFlight / 2);
 
-  const results = calculate()
+    const results: {
+      timeInFlight: number;
+      jumpHeight: number;
+      takeoffVelocity: number;
+    } = {
+      timeInFlight,
+      jumpHeight: jumpHeightCm,
+      takeoffVelocity,
+    };
+
+    return results;
+  };
+
+  const results = calculate();
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -42,11 +62,11 @@ export default function JumpCalculator() {
         <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
           Input Parameters
         </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label 
-              htmlFor="fps" 
+            <label
+              htmlFor="fps"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Frames per Second
@@ -63,8 +83,8 @@ export default function JumpCalculator() {
           </div>
 
           <div>
-            <label 
-              htmlFor="frames" 
+            <label
+              htmlFor="frames"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Amount of Frames
@@ -81,8 +101,8 @@ export default function JumpCalculator() {
           </div>
 
           <div>
-            <label 
-              htmlFor="weight" 
+            <label
+              htmlFor="weight"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Body Weight (kg)
@@ -99,8 +119,8 @@ export default function JumpCalculator() {
           </div>
 
           <div>
-            <label 
-              htmlFor="legLength" 
+            <label
+              htmlFor="legLength"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Leg Length (cm)
@@ -117,8 +137,8 @@ export default function JumpCalculator() {
           </div>
 
           <div className="md:col-span-2">
-            <label 
-              htmlFor="height90" 
+            <label
+              htmlFor="height90"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Height with 90 Degree (cm)
@@ -135,37 +155,72 @@ export default function JumpCalculator() {
           </div>
         </div>
 
-        {results && (
-          <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-              Calculation Results
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Time Duration</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  {results.timeInSeconds.toFixed(3)} seconds
+        <div className="mt-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Time in Flight
+            </label>
+            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+              {results ? (
+                <>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    {results.timeInFlight.toFixed(2)} seconds
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    (frames ÷ fps)
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">
+                  Enter Frames per Second and Amount of Frames
                 </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Jump Height</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  {results.jumpHeight} cm
-                </p>
-              </div>
+              )}
             </div>
           </div>
-        )}
-
-        {!results && (
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              Fill in all fields to see calculation results
-            </p>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Jump Height
+            </label>
+            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+              {results ? (
+                <>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    {results.jumpHeight.toFixed(2)} cm
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    (calculated from time in flight)
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">
+                  Enter Frames per Second and Amount of Frames
+                </p>
+              )}
+            </div>
           </div>
-        )}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Takeoff Velocity
+            </label>
+            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+              {results ? (
+                <>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    {results.takeoffVelocity.toFixed(2)} m/s
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    (calculated from time in flight)
+                  </p>
+                </>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">
+                  Enter Frames per Second and Amount of Frames
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }
-
