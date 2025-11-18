@@ -188,14 +188,14 @@ export default function JumpCalculator() {
   const results = calculate();
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+    <div className="w-full max-w-4xl mx-auto px-2 md:px-0">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+        <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-900 dark:text-white">
           Input Parameters
         </h2>
 
         {session?.user?.email && measurements.length > 0 && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+          <div className="mb-4 md:mb-6 p-3 md:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
             <label
               htmlFor="measurementSelect"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -228,8 +228,8 @@ export default function JumpCalculator() {
           </div>
         )}
 
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 md:mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Frame Input Mode
@@ -284,7 +284,7 @@ export default function JumpCalculator() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div>
             <label
               htmlFor="fps"
@@ -390,7 +390,7 @@ export default function JumpCalculator() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-6">
           <div>
             <label
               htmlFor="weight"
@@ -455,7 +455,7 @@ export default function JumpCalculator() {
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-4 md:mt-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Time in Flight
@@ -463,7 +463,7 @@ export default function JumpCalculator() {
             <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
               {results ? (
                 <>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
                     {formatNumber(results.timeInFlightMs)} ms
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -484,7 +484,7 @@ export default function JumpCalculator() {
             <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
               {results ? (
                 <>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
                     {formatNumber(results.jumpHeight)} cm
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -505,7 +505,7 @@ export default function JumpCalculator() {
             <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
               {results ? (
                 <>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
                     {formatNumber(results.takeoffVelocity)} m/s
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -526,7 +526,7 @@ export default function JumpCalculator() {
             <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
               {results && results.averageForce !== null ? (
                 <>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
                     {formatNumber(results.averageForce)} N
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -548,7 +548,7 @@ export default function JumpCalculator() {
             <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
               {results && results.relativeForce !== null ? (
                 <>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
                     {formatNumber(results.relativeForce, 3)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
