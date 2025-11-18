@@ -27,7 +27,10 @@ export default function MeasurementsList() {
     weightKg: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchMeasurements();
@@ -46,7 +49,9 @@ export default function MeasurementsList() {
 
       setMeasurements(data.measurements || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load measurements");
+      setError(
+        err instanceof Error ? err.message : "Failed to load measurements"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -113,12 +118,20 @@ export default function MeasurementsList() {
 
       setShowForm(false);
       setEditingId(null);
-      setFormData({ name: "", legLength: "", height90Degree: "", weightKg: "" });
+      setFormData({
+        name: "",
+        legLength: "",
+        height90Degree: "",
+        weightKg: "",
+      });
       await fetchMeasurements();
     } catch (err) {
       setMessage({
         type: "error",
-        text: err instanceof Error ? err.message : "Failed to save measurement. Please try again.",
+        text:
+          err instanceof Error
+            ? err.message
+            : "Failed to save measurement. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -150,7 +163,10 @@ export default function MeasurementsList() {
     } catch (err) {
       setMessage({
         type: "error",
-        text: err instanceof Error ? err.message : "Failed to delete measurement. Please try again.",
+        text:
+          err instanceof Error
+            ? err.message
+            : "Failed to delete measurement. Please try again.",
       });
     }
   };
@@ -177,7 +193,9 @@ export default function MeasurementsList() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading measurements...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">
+              Loading measurements...
+            </p>
           </div>
         </div>
       </div>
@@ -206,7 +224,7 @@ export default function MeasurementsList() {
     <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Form for Create/Edit */}
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
             {editingId ? "Edit Measurement" : "Add New Measurement"}
           </h2>
@@ -314,18 +332,18 @@ export default function MeasurementsList() {
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 sm:flex-none px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Saving..." : editingId ? "Update" : "Save"}
               </button>
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
               >
                 Cancel
               </button>
@@ -335,25 +353,39 @@ export default function MeasurementsList() {
       )}
 
       {/* Measurements Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+        <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
             All Measurements ({measurements.length})
           </h2>
           <div className="flex gap-2">
             {!showForm && (
               <button
                 onClick={handleCreate}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-sm md:text-base bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
               >
                 Add New
               </button>
             )}
             <button
               onClick={fetchMeasurements}
-              className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+              className="px-3 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+              title="Refresh"
             >
-              Refresh
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
             </button>
           </div>
         </div>
@@ -393,68 +425,121 @@ export default function MeasurementsList() {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-gray-300 dark:border-gray-600">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Name
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Leg Length (cm)
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Height 90° (cm)
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Weight (kg)
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Created At
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {measurements.map((measurement) => (
-                  <tr
-                    key={measurement.id}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
-                    onClick={() => handleEdit(measurement)}
-                  >
-                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+          <>
+            {/* Mobile: Card Layout */}
+            <div className="md:hidden space-y-3">
+              {measurements.map((measurement) => (
+                <div
+                  key={measurement.id}
+                  onClick={() => handleEdit(measurement)}
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                       {measurement.name}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
-                      {formatNumber(measurement.leg_length)}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
-                      {formatNumber(measurement.height_90_degree)}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
-                      {measurement.weight_kg ? formatNumber(measurement.weight_kg) : "-"}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                      {formatDate(measurement.created_at)}
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(measurement.id);
-                        }}
-                        className="px-3 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </td>
+                    </h3>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(measurement.id);
+                      }}
+                      className="px-2 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Leg Length:
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {formatNumber(measurement.leg_length)} cm
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Height 90°:
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {formatNumber(measurement.height_90_degree)} cm
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Weight:
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {measurement.weight_kg
+                          ? `${formatNumber(measurement.weight_kg)} kg`
+                          : "-"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table Layout */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-300 dark:border-gray-600">
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Name
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Leg Length (cm)
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Height 90° (cm)
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Weight (kg)
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {measurements.map((measurement) => (
+                    <tr
+                      key={measurement.id}
+                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                      onClick={() => handleEdit(measurement)}
+                    >
+                      <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                        {measurement.name}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
+                        {formatNumber(measurement.leg_length)}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
+                        {formatNumber(measurement.height_90_degree)}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
+                        {measurement.weight_kg
+                          ? formatNumber(measurement.weight_kg)
+                          : "-"}
+                      </td>
+                      <td className="py-3 px-4 text-sm">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(measurement.id);
+                          }}
+                          className="px-3 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

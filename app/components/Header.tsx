@@ -16,10 +16,57 @@ export default function Header() {
   return (
     <header className="w-full max-w-5xl mb-4 md:mb-8">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 md:gap-4">
-        <div className="flex items-center gap-2 md:gap-4 flex-wrap">
+        {/* Mobile: Tab-like navigation */}
+        <div className="md:hidden w-full">
+          {session?.user?.email ? (
+            <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
+              <Link
+                href="/"
+                className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  pathname === "/"
+                    ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              >
+                Calculator
+              </Link>
+              <Link
+                href="/view-data"
+                className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  pathname === "/view-data"
+                    ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              >
+                Measurements
+              </Link>
+              <Link
+                href="/settings"
+                className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  pathname === "/settings"
+                    ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              >
+                Settings
+              </Link>
+            </div>
+          ) : (
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              Calculator
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: Regular navigation */}
+        <div className="hidden md:flex items-center gap-2 md:gap-4">
           <Link
             href="/"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className={`text-sm font-medium transition-colors ${
+              pathname === "/"
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            }`}
           >
             Calculator
           </Link>
