@@ -36,10 +36,10 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-center mb-2 text-gray-900 dark:text-white">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 md:p-8">
+      <div className="w-full max-w-md px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-900 dark:text-white">
             Sign In
           </h1>
           <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
