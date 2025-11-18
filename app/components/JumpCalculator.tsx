@@ -5,27 +5,39 @@ import { useState } from "react";
 export default function JumpCalculator() {
   const [framesPerSecond, setFramesPerSecond] = useState<string>("");
   const [amountOfFrames, setAmountOfFrames] = useState<string>("");
+  const [startFrame, setStartFrame] = useState<string>("");
+  const [endFrame, setEndFrame] = useState<string>("");
   const [bodyWeight, setBodyWeight] = useState<string>("");
   const [legLength, setLegLength] = useState<string>("");
   const [height90Degree, setHeight90Degree] = useState<string>("");
 
   const calculate = () => {
     const fps = parseFloat(framesPerSecond);
-    const frames = parseFloat(amountOfFrames);
+    const start = parseFloat(startFrame);
+    const end = parseFloat(endFrame);
     const weight = parseFloat(bodyWeight);
     const legLen = parseFloat(legLength);
     const height90 = parseFloat(height90Degree);
 
+    // Calculate frames from start and end frame if provided
+    let calculatedFrames = parseFloat(amountOfFrames);
+    const isValidStartFrame = !isNaN(start) && startFrame.trim() !== "";
+    const isValidEndFrame = !isNaN(end) && endFrame.trim() !== "";
+    
+    if (isValidStartFrame && isValidEndFrame && end >= start) {
+      calculatedFrames = end - start;
+    }
+
     // Check if fps and frames are valid numbers
     const isValidFps = !isNaN(fps) && framesPerSecond.trim() !== "" && fps > 0;
-    const isValidFrames = !isNaN(frames) && amountOfFrames.trim() !== "";
+    const isValidFrames = !isNaN(calculatedFrames) && (amountOfFrames.trim() !== "" || (isValidStartFrame && isValidEndFrame)) && calculatedFrames > 0;
 
     // Time in flight calculation: amount of frames / frames per second = time in seconds
     if (!isValidFps || !isValidFrames) {
       return null;
     }
 
-    const timeInFlight = frames / fps; // in seconds
+    const timeInFlight = calculatedFrames / fps; // in seconds
     const timeInFlightMs = timeInFlight * 1000; // convert to milliseconds
 
     // Calculate jump height based on time in flight
@@ -134,6 +146,65 @@ export default function JumpCalculator() {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 15, 30, 60"
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="startFrame"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Start Frame
+            </label>
+            <input
+              id="startFrame"
+              type="number"
+              step="1"
+              value={startFrame}
+              onChange={(e) => setStartFrame(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="e.g., 10, 20, 30"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="endFrame"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              End Frame
+            </label>
+            <input
+              id="endFrame"
+              type="number"
+              step="1"
+              value={endFrame}
+              onChange={(e) => setEndFrame(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="e.g., 25, 50, 90"
+            />
+            {(() => {
+              const start = parseFloat(startFrame);
+              const end = parseFloat(endFrame);
+              const isValidStart = !isNaN(start) && startFrame.trim() !== "";
+              const isValidEnd = !isNaN(end) && endFrame.trim() !== "";
+              if (isValidStart && isValidEnd) {
+                if (end >= start) {
+                  const calculated = end - start;
+                  return (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                      Calculated frames: {calculated}
+                    </p>
+                  );
+                } else {
+                  return (
+                    <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                      End frame must be greater than or equal to start frame
+                    </p>
+                  );
+                }
+              }
+              return null;
+            })()}
           </div>
 
           <div>
