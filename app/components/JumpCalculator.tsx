@@ -1,8 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { formatNumber } from "@/lib/formatNumber";
+
+interface Measurement {
+  id: number;
+  name: string;
+  leg_length: string;
+  height_90_degree: string;
+  weight_kg: string | null;
+}
 
 export default function JumpCalculator() {
+  const { data: session } = useSession();
   const [framesPerSecond, setFramesPerSecond] = useState<string>("");
   const [amountOfFrames, setAmountOfFrames] = useState<string>("");
   const [startFrame, setStartFrame] = useState<string>("");
@@ -10,6 +21,70 @@ export default function JumpCalculator() {
   const [bodyWeight, setBodyWeight] = useState<string>("");
   const [legLength, setLegLength] = useState<string>("");
   const [height90Degree, setHeight90Degree] = useState<string>("");
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [selectedMeasurementId, setSelectedMeasurementId] =
+    useState<string>("");
+  const [useFrameRange, setUseFrameRange] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchMeasurements();
+      fetchSettings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.email]);
+
+  const fetchMeasurements = async () => {
+    try {
+      const response = await fetch("/api/measurements");
+      const data = await response.json();
+      if (response.ok && data.measurements) {
+        setMeasurements(data.measurements);
+      }
+    } catch (error) {
+      console.error("Failed to fetch measurements:", error);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch("/api/settings");
+      const data = await response.json();
+      if (
+        response.ok &&
+        data.settings?.framesPerSecond !== null &&
+        data.settings?.framesPerSecond !== undefined
+      ) {
+        setFramesPerSecond(data.settings.framesPerSecond.toString());
+      }
+    } catch (error) {
+      console.error("Failed to fetch settings:", error);
+    }
+  };
+
+  const handleMeasurementSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    setSelectedMeasurementId(selectedId);
+
+    if (selectedId) {
+      const measurement = measurements.find(
+        (m) => m.id === parseInt(selectedId)
+      );
+      if (measurement) {
+        setLegLength(measurement.leg_length);
+        setHeight90Degree(measurement.height_90_degree);
+        if (measurement.weight_kg) {
+          setBodyWeight(measurement.weight_kg);
+        } else {
+          setBodyWeight("");
+        }
+      }
+    } else {
+      setLegLength("");
+      setHeight90Degree("");
+      setBodyWeight("");
+    }
+  };
 
   const calculate = () => {
     const fps = parseFloat(framesPerSecond);
@@ -19,18 +94,26 @@ export default function JumpCalculator() {
     const legLen = parseFloat(legLength);
     const height90 = parseFloat(height90Degree);
 
-    // Calculate frames from start and end frame if provided
-    let calculatedFrames = parseFloat(amountOfFrames);
+    // Calculate frames based on input mode
+    let calculatedFrames: number;
     const isValidStartFrame = !isNaN(start) && startFrame.trim() !== "";
     const isValidEndFrame = !isNaN(end) && endFrame.trim() !== "";
-    
-    if (isValidStartFrame && isValidEndFrame && end >= start) {
+
+    if (useFrameRange && isValidStartFrame && isValidEndFrame && end >= start) {
       calculatedFrames = end - start;
+    } else if (!useFrameRange) {
+      calculatedFrames = parseFloat(amountOfFrames);
+    } else {
+      return null; // Invalid input in frame range mode
     }
 
     // Check if fps and frames are valid numbers
     const isValidFps = !isNaN(fps) && framesPerSecond.trim() !== "" && fps > 0;
-    const isValidFrames = !isNaN(calculatedFrames) && (amountOfFrames.trim() !== "" || (isValidStartFrame && isValidEndFrame)) && calculatedFrames > 0;
+    const isValidFrames =
+      !isNaN(calculatedFrames) &&
+      ((!useFrameRange && amountOfFrames.trim() !== "") ||
+        (useFrameRange && isValidStartFrame && isValidEndFrame)) &&
+      calculatedFrames > 0;
 
     // Time in flight calculation: amount of frames / frames per second = time in seconds
     if (!isValidFps || !isValidFrames) {
@@ -111,6 +194,96 @@ export default function JumpCalculator() {
           Input Parameters
         </h2>
 
+        {session?.user?.email && measurements.length > 0 && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+            <label
+              htmlFor="measurementSelect"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Load Saved Measurement
+            </label>
+            <select
+              id="measurementSelect"
+              value={selectedMeasurementId}
+              onChange={handleMeasurementSelect}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="">-- Select a measurement --</option>
+              {measurements.map((measurement) => (
+                <option key={measurement.id} value={measurement.id}>
+                  {measurement.name} (Leg:{" "}
+                  {formatNumber(measurement.leg_length)}cm, Height 90°:{" "}
+                  {formatNumber(measurement.height_90_degree)}cm
+                  {measurement.weight_kg
+                    ? `, Weight: ${formatNumber(measurement.weight_kg)}kg`
+                    : ""}
+                  )
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              Selecting a measurement will fill in Leg Length, Height 90°, and
+              Weight (if available)
+            </p>
+          </div>
+        )}
+
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Frame Input Mode
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Choose how to specify the number of frames
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setUseFrameRange(!useFrameRange);
+                // Clear the other mode's fields when switching
+                if (!useFrameRange) {
+                  setAmountOfFrames("");
+                } else {
+                  setStartFrame("");
+                  setEndFrame("");
+                }
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                useFrameRange ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  useFrameRange ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span
+              className={
+                useFrameRange
+                  ? "font-semibold text-blue-600 dark:text-blue-400"
+                  : ""
+              }
+            >
+              {useFrameRange ? "✓ Frame Range" : "Frame Range"}
+            </span>
+            <span className="mx-2">•</span>
+            <span
+              className={
+                !useFrameRange
+                  ? "font-semibold text-blue-600 dark:text-blue-400"
+                  : ""
+              }
+            >
+              {!useFrameRange ? "✓ Direct Input" : "Direct Input"}
+            </span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label
@@ -130,58 +303,67 @@ export default function JumpCalculator() {
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="frames"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Amount of Frames
-            </label>
-            <input
-              id="frames"
-              type="number"
-              step="1"
-              value={amountOfFrames}
-              onChange={(e) => setAmountOfFrames(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., 15, 30, 60"
-            />
-          </div>
+          {!useFrameRange ? (
+            <div>
+              <label
+                htmlFor="frames"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Amount of Frames
+              </label>
+              <input
+                id="frames"
+                type="number"
+                step="1"
+                value={amountOfFrames}
+                onChange={(e) => setAmountOfFrames(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                placeholder="e.g., 15, 30, 60"
+              />
+            </div>
+          ) : (
+            <>
+              <div>
+                <label
+                  htmlFor="startFrame"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Start Frame
+                </label>
+                <input
+                  id="startFrame"
+                  type="number"
+                  step="1"
+                  value={startFrame}
+                  onChange={(e) => setStartFrame(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="e.g., 10, 20, 30"
+                />
+              </div>
 
-          <div>
-            <label
-              htmlFor="startFrame"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Start Frame
-            </label>
-            <input
-              id="startFrame"
-              type="number"
-              step="1"
-              value={startFrame}
-              onChange={(e) => setStartFrame(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., 10, 20, 30"
-            />
-          </div>
+              <div>
+                <label
+                  htmlFor="endFrame"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  End Frame
+                </label>
+                <input
+                  id="endFrame"
+                  type="number"
+                  step="1"
+                  value={endFrame}
+                  onChange={(e) => setEndFrame(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="e.g., 25, 50, 90"
+                />
+              </div>
+            </>
+          )}
+        </div>
 
-          <div>
-            <label
-              htmlFor="endFrame"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              End Frame
-            </label>
-            <input
-              id="endFrame"
-              type="number"
-              step="1"
-              value={endFrame}
-              onChange={(e) => setEndFrame(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., 25, 50, 90"
-            />
+        {useFrameRange && (
+          <div className="mt-2 mb-4">
             {(() => {
               const start = parseFloat(startFrame);
               const end = parseFloat(endFrame);
@@ -206,7 +388,9 @@ export default function JumpCalculator() {
               return null;
             })()}
           </div>
+        )}
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
             <label
               htmlFor="weight"
@@ -219,7 +403,10 @@ export default function JumpCalculator() {
               type="number"
               step="0.1"
               value={bodyWeight}
-              onChange={(e) => setBodyWeight(e.target.value)}
+              onChange={(e) => {
+                setBodyWeight(e.target.value);
+                setSelectedMeasurementId("");
+              }}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 70, 80, 90"
             />
@@ -237,7 +424,10 @@ export default function JumpCalculator() {
               type="number"
               step="0.1"
               value={legLength}
-              onChange={(e) => setLegLength(e.target.value)}
+              onChange={(e) => {
+                setLegLength(e.target.value);
+                setSelectedMeasurementId("");
+              }}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 80, 90, 100"
             />
@@ -248,14 +438,17 @@ export default function JumpCalculator() {
               htmlFor="height90"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
-              Height with 90 Degree (cm)
+              Height 90° (cm)
             </label>
             <input
               id="height90"
               type="number"
               step="0.1"
               value={height90Degree}
-              onChange={(e) => setHeight90Degree(e.target.value)}
+              onChange={(e) => {
+                setHeight90Degree(e.target.value);
+                setSelectedMeasurementId("");
+              }}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 150, 180, 200"
             />
@@ -271,7 +464,7 @@ export default function JumpCalculator() {
               {results ? (
                 <>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {results.timeInFlightMs.toFixed(2)} ms
+                    {formatNumber(results.timeInFlightMs)} ms
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     (frames ÷ fps)
@@ -292,7 +485,7 @@ export default function JumpCalculator() {
               {results ? (
                 <>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {results.jumpHeight.toFixed(2)} cm
+                    {formatNumber(results.jumpHeight)} cm
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     (calculated from time in flight)
@@ -313,7 +506,7 @@ export default function JumpCalculator() {
               {results ? (
                 <>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {results.takeoffVelocity.toFixed(2)} m/s
+                    {formatNumber(results.takeoffVelocity)} m/s
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     (calculated from time in flight)
@@ -334,7 +527,7 @@ export default function JumpCalculator() {
               {results && results.averageForce !== null ? (
                 <>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {results.averageForce.toFixed(2)} N
+                    {formatNumber(results.averageForce)} N
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     (calculated from body weight, takeoff velocity, leg length,
@@ -343,8 +536,7 @@ export default function JumpCalculator() {
                 </>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">
-                  Enter Body Weight, Leg Length, and Height with 90 Degree to
-                  calculate
+                  Enter Body Weight, Leg Length, and Height 90° to calculate
                 </p>
               )}
             </div>
@@ -357,7 +549,7 @@ export default function JumpCalculator() {
               {results && results.relativeForce !== null ? (
                 <>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {results.relativeForce.toFixed(3)}
+                    {formatNumber(results.relativeForce, 3)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     (average force divided by body weight × 9.81, multiple of
@@ -366,8 +558,7 @@ export default function JumpCalculator() {
                 </>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">
-                  Enter Body Weight, Leg Length, and Height with 90 Degree to
-                  calculate
+                  Enter Body Weight, Leg Length, and Height 90° to calculate
                 </p>
               )}
             </div>

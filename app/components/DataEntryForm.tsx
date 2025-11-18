@@ -1,22 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useSession } from "next-auth/react"
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function DataEntryForm() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
   const [formData, setFormData] = useState({
     name: "",
     legLength: "",
     height90Degree: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setMessage(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
 
     try {
       const response = await fetch("/api/measurements", {
@@ -27,40 +30,44 @@ export default function DataEntryForm() {
           legLength: formData.legLength,
           height90Degree: formData.height90Degree,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save data")
+        throw new Error(data.error || "Failed to save data");
       }
 
       setMessage({
         type: "success",
         text: data.message || "Data saved successfully!",
-      })
-      setFormData({ name: "", legLength: "", height90Degree: "" })
+      });
+      setFormData({ name: "", legLength: "", height90Degree: "" });
     } catch (error) {
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Failed to save data. Please try again.",
-      })
+        text:
+          error instanceof Error
+            ? error.message
+            : "Failed to save data. Please try again.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
         {session?.user?.email && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            Logged in as: <span className="font-semibold">{session.user.email}</span>
+            Logged in as:{" "}
+            <span className="font-semibold">{session.user.email}</span>
           </p>
         )}
 
@@ -110,7 +117,7 @@ export default function DataEntryForm() {
               htmlFor="height90Degree"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
-              Height with 90 Degree (cm)
+              Height 90° (cm)
             </label>
             <input
               id="height90Degree"
@@ -156,6 +163,5 @@ export default function DataEntryForm() {
         </form>
       </div>
     </div>
-  )
+  );
 }
-

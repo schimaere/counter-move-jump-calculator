@@ -23,16 +23,28 @@ export default function Header() {
           Calculator
         </Link>
         {session?.user?.email && (
-          <Link
-            href="/data-entry"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/data-entry"
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            }`}
-          >
-            Data Entry
-          </Link>
+          <>
+            <Link
+              href="/view-data"
+              className={`text-sm font-medium transition-colors ${
+                pathname === "/view-data"
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              Measurements
+            </Link>
+            <Link
+              href="/settings"
+              className={`text-sm font-medium transition-colors ${
+                pathname === "/settings"
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              Settings
+            </Link>
+          </>
         )}
       </div>
       <div className="flex items-center gap-4">
