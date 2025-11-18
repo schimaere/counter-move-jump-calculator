@@ -82,27 +82,122 @@ export default function Header() {
         {/* Mobile: Tab-like navigation */}
         <div className="md:hidden w-full">
           {session?.user?.email ? (
-            <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
-              <Link
-                href="/"
-                className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                  pathname === "/"
-                    ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
-                    : "text-gray-600 dark:text-gray-400"
-                }`}
-              >
-                Calculator
-              </Link>
-              <Link
-                href="/view-data"
-                className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                  pathname === "/view-data"
-                    ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
-                    : "text-gray-600 dark:text-gray-400"
-                }`}
-              >
-                Measurements
-              </Link>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-1 rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
+                <Link
+                  href="/"
+                  className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/"
+                      ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "text-gray-600 dark:text-gray-400"
+                  }`}
+                >
+                  Calculator
+                </Link>
+                <Link
+                  href="/view-data"
+                  className={`flex-1 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/view-data"
+                      ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "text-gray-600 dark:text-gray-400"
+                  }`}
+                >
+                  Measurements
+                </Link>
+              </div>
+              <div className="relative" ref={menuRef}>
+                <button
+                  ref={menuButtonRef}
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className={`flex items-center justify-center p-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/settings"
+                      ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                  }`}
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </button>
+                {isUserMenuOpen && (
+                  <div
+                    ref={menuDropdownRef}
+                    className="absolute right-0 mt-2 w-56 min-w-[200px] max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50"
+                  >
+                    <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {session.user.email}
+                      </p>
+                    </div>
+                    <Link
+                      href="/settings"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className={`block px-4 py-2 text-sm transition-colors ${
+                        pathname === "/settings"
+                          ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        Settings
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        signOut({ callbackUrl: "/" });
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                          />
+                        </svg>
+                        Sign Out
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -112,31 +207,31 @@ export default function Header() {
         </div>
 
         {/* Desktop: Regular navigation */}
-        <div className="hidden md:flex items-center gap-2 md:gap-4">
-          <Link
-            href="/"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/"
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            }`}
-          >
-            Calculator
-          </Link>
-          {session?.user?.email && (
+        <div className="hidden md:flex items-center gap-2 md:gap-4 md:justify-between w-full">
+          <div className="flex items-center gap-2 md:gap-4">
             <Link
-              href="/view-data"
+              href="/"
               className={`text-sm font-medium transition-colors ${
-                pathname === "/view-data"
+                pathname === "/"
                   ? "text-blue-600 dark:text-blue-400"
                   : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              Measurements
+              Calculator
             </Link>
-          )}
-        </div>
-        <div className="flex items-center gap-2 md:gap-4">
+            {session?.user?.email && (
+              <Link
+                href="/view-data"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === "/view-data"
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                Measurements
+              </Link>
+            )}
+          </div>
           {status === "loading" ? (
             <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
               Loading...
