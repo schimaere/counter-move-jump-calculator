@@ -1,11 +1,13 @@
 "use client"
 
 import { signIn, signOut, useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import Link from "next/link"
 
 export default function Header() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
 
   const handleSignIn = () => {
     router.push("/auth/signin")
@@ -13,7 +15,38 @@ export default function Header() {
 
   return (
     <header className="w-full max-w-5xl mb-8 flex justify-between items-center">
-      <div className="flex-1"></div>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/"
+          className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          Calculator
+        </Link>
+        {session?.user?.email && (
+          <>
+            <Link
+              href="/view-data"
+              className={`text-sm font-medium transition-colors ${
+                pathname === "/view-data"
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              Measurements
+            </Link>
+            <Link
+              href="/settings"
+              className={`text-sm font-medium transition-colors ${
+                pathname === "/settings"
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              Settings
+            </Link>
+          </>
+        )}
+      </div>
       <div className="flex items-center gap-4">
         {status === "loading" ? (
           <span className="text-sm text-gray-500 dark:text-gray-400">Loading...</span>
