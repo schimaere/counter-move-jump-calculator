@@ -1,6 +1,6 @@
-import AuthWrapper from "../components/AuthWrapper"
-import MeasurementsList from "../components/MeasurementsList"
-import Header from "../components/Header"
+import AuthWrapper from "../components/AuthWrapper";
+import MeasurementsList from "../components/MeasurementsList";
+import Header from "../components/Header";
 
 export default function ViewDataPage() {
   return (
@@ -12,12 +12,11 @@ export default function ViewDataPage() {
             Measurements
           </h1>
           <p className="text-center text-gray-600 dark:text-gray-400 mb-4 md:mb-8 px-2">
-            Manage measurement data for people
+            Manage measurement data for athletes
           </p>
           <MeasurementsList />
         </div>
       </main>
     </AuthWrapper>
-  )
+  );
 }
-

@@ -206,7 +206,7 @@ export default function JumpCalculator() {
               id="measurementSelect"
               value={selectedMeasurementId}
               onChange={handleMeasurementSelect}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="">-- Select a measurement --</option>
               {measurements.map((measurement) => (
@@ -250,13 +250,15 @@ export default function JumpCalculator() {
                   setEndFrame("");
                 }
               }}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              className={`relative inline-flex h-7 w-12 md:h-6 md:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                 useFrameRange ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  useFrameRange ? "translate-x-6" : "translate-x-1"
+                className={`inline-block h-5 w-5 md:h-4 md:w-4 transform rounded-full bg-white transition-transform ${
+                  useFrameRange
+                    ? "translate-x-6 md:translate-x-6"
+                    : "translate-x-1"
                 }`}
               />
             </button>
@@ -298,7 +300,7 @@ export default function JumpCalculator() {
               step="0.01"
               value={framesPerSecond}
               onChange={(e) => setFramesPerSecond(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 30, 60, 120"
             />
           </div>
@@ -317,7 +319,7 @@ export default function JumpCalculator() {
                 step="1"
                 value={amountOfFrames}
                 onChange={(e) => setAmountOfFrames(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="e.g., 15, 30, 60"
               />
             </div>
@@ -336,7 +338,7 @@ export default function JumpCalculator() {
                   step="1"
                   value={startFrame}
                   onChange={(e) => setStartFrame(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="e.g., 10, 20, 30"
                 />
               </div>
@@ -354,7 +356,7 @@ export default function JumpCalculator() {
                   step="1"
                   value={endFrame}
                   onChange={(e) => setEndFrame(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="e.g., 25, 50, 90"
                 />
               </div>
@@ -407,7 +409,7 @@ export default function JumpCalculator() {
                 setBodyWeight(e.target.value);
                 setSelectedMeasurementId("");
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 70, 80, 90"
             />
           </div>
@@ -428,7 +430,7 @@ export default function JumpCalculator() {
                 setLegLength(e.target.value);
                 setSelectedMeasurementId("");
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 80, 90, 100"
             />
           </div>
@@ -449,13 +451,13 @@ export default function JumpCalculator() {
                 setHeight90Degree(e.target.value);
                 setSelectedMeasurementId("");
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 150, 180, 200"
             />
           </div>
         </div>
 
-        <div className="mt-4 md:mt-6">
+        <div className="mt-4 md:mt-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Time in Flight
@@ -477,7 +479,7 @@ export default function JumpCalculator() {
               )}
             </div>
           </div>
-          <div className="mt-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Jump Height
             </label>
@@ -498,7 +500,7 @@ export default function JumpCalculator() {
               )}
             </div>
           </div>
-          <div className="mt-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Takeoff Velocity
             </label>
@@ -519,7 +521,7 @@ export default function JumpCalculator() {
               )}
             </div>
           </div>
-          <div className="mt-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Average Force (Fm)
             </label>
@@ -541,7 +543,7 @@ export default function JumpCalculator() {
               )}
             </div>
           </div>
-          <div className="mt-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Relative Force (Frel)
             </label>

@@ -77,7 +77,7 @@ export default function SettingsForm() {
   if (isLoading) {
     return (
       <div className="w-full max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">Loading settings...</p>
@@ -89,14 +89,8 @@ export default function SettingsForm() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        {session?.user?.email && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            Settings for: <span className="font-semibold">{session.user.email}</span>
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 lg:p-8">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           <div>
             <label
               htmlFor="framesPerSecond"
@@ -112,7 +106,7 @@ export default function SettingsForm() {
               value={framesPerSecond}
               onChange={(e) => setFramesPerSecond(e.target.value)}
               min="0.01"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="e.g., 30, 60, 120"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -143,7 +137,7 @@ export default function SettingsForm() {
           <button
             type="submit"
             disabled={isSaving}
-            className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 md:py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base md:text-sm"
           >
             {isSaving ? "Saving..." : "Save Settings"}
           </button>
