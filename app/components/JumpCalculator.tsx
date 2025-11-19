@@ -25,6 +25,8 @@ export default function JumpCalculator() {
   const [selectedMeasurementId, setSelectedMeasurementId] =
     useState<string>("");
   const [useFrameRange, setUseFrameRange] = useState<boolean>(false);
+  const [isAthleteMetricsOpen, setIsAthleteMetricsOpen] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -78,6 +80,8 @@ export default function JumpCalculator() {
         } else {
           setBodyWeight("");
         }
+        // Auto-expand accordion when measurement is selected
+        setIsAthleteMetricsOpen(true);
       }
     } else {
       setLegLength("");
@@ -194,39 +198,148 @@ export default function JumpCalculator() {
           Input Parameters
         </h2>
 
-        {session?.user?.email && measurements.length > 0 && (
-          <div className="mb-4 md:mb-6 p-3 md:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-            <label
-              htmlFor="measurementSelect"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        <div className="mb-4 md:mb-6 space-y-4">
+          {session?.user?.email && measurements.length > 0 && (
+            <div className="p-3 md:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+              <label
+                htmlFor="measurementSelect"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Load Saved Measurement
+              </label>
+              <select
+                id="measurementSelect"
+                value={selectedMeasurementId}
+                onChange={handleMeasurementSelect}
+                className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value="">-- Select a measurement --</option>
+                {measurements.map((measurement) => (
+                  <option key={measurement.id} value={measurement.id}>
+                    {measurement.name} (Leg:{" "}
+                    {formatNumber(measurement.leg_length)}cm, Height 90°:{" "}
+                    {formatNumber(measurement.height_90_degree)}cm
+                    {measurement.weight_kg
+                      ? `, Weight: ${formatNumber(measurement.weight_kg)}kg`
+                      : ""}
+                    )
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Selecting a measurement will fill in Leg Length, Height 90°, and
+                Weight (if available)
+              </p>
+            </div>
+          )}
+
+          <div className="border border-gray-200 dark:border-gray-600 rounded-md overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setIsAthleteMetricsOpen(!isAthleteMetricsOpen)}
+              className="w-full px-4 py-3 md:py-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between text-left"
             >
-              Load Saved Measurement
-            </label>
-            <select
-              id="measurementSelect"
-              value={selectedMeasurementId}
-              onChange={handleMeasurementSelect}
-              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Athlete Metrics
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Body Weight, Leg Length, Height 90° (typically constant per
+                  session)
+                </p>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${
+                  isAthleteMetricsOpen ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                isAthleteMetricsOpen
+                  ? "max-h-[500px] opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
             >
-              <option value="">-- Select a measurement --</option>
-              {measurements.map((measurement) => (
-                <option key={measurement.id} value={measurement.id}>
-                  {measurement.name} (Leg:{" "}
-                  {formatNumber(measurement.leg_length)}cm, Height 90°:{" "}
-                  {formatNumber(measurement.height_90_degree)}cm
-                  {measurement.weight_kg
-                    ? `, Weight: ${formatNumber(measurement.weight_kg)}kg`
-                    : ""}
-                  )
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Selecting a measurement will fill in Leg Length, Height 90°, and
-              Weight (if available)
-            </p>
+              <div className="p-4 md:p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div>
+                    <label
+                      htmlFor="weight"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Body Weight (kg)
+                    </label>
+                    <input
+                      id="weight"
+                      type="number"
+                      step="0.1"
+                      value={bodyWeight}
+                      onChange={(e) => {
+                        setBodyWeight(e.target.value);
+                        setSelectedMeasurementId("");
+                      }}
+                      className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="e.g., 70, 80, 90"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="legLength"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Leg Length (cm)
+                    </label>
+                    <input
+                      id="legLength"
+                      type="number"
+                      step="0.1"
+                      value={legLength}
+                      onChange={(e) => {
+                        setLegLength(e.target.value);
+                        setSelectedMeasurementId("");
+                      }}
+                      className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="e.g., 80, 90, 100"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label
+                      htmlFor="height90"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Height 90° (cm)
+                    </label>
+                    <input
+                      id="height90"
+                      type="number"
+                      step="0.1"
+                      value={height90Degree}
+                      onChange={(e) => {
+                        setHeight90Degree(e.target.value);
+                        setSelectedMeasurementId("");
+                      }}
+                      className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="e.g., 150, 180, 200"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
         <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 md:mb-4">
@@ -286,7 +399,13 @@ export default function JumpCalculator() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div
+          className={`grid gap-4 md:gap-6 ${
+            useFrameRange
+              ? "grid-cols-1 md:grid-cols-3"
+              : "grid-cols-1 md:grid-cols-2"
+          }`}
+        >
           <div>
             <label
               htmlFor="fps"
@@ -391,71 +510,6 @@ export default function JumpCalculator() {
             })()}
           </div>
         )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-6">
-          <div>
-            <label
-              htmlFor="weight"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Body Weight (kg)
-            </label>
-            <input
-              id="weight"
-              type="number"
-              step="0.1"
-              value={bodyWeight}
-              onChange={(e) => {
-                setBodyWeight(e.target.value);
-                setSelectedMeasurementId("");
-              }}
-              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., 70, 80, 90"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="legLength"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Leg Length (cm)
-            </label>
-            <input
-              id="legLength"
-              type="number"
-              step="0.1"
-              value={legLength}
-              onChange={(e) => {
-                setLegLength(e.target.value);
-                setSelectedMeasurementId("");
-              }}
-              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., 80, 90, 100"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label
-              htmlFor="height90"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Height 90° (cm)
-            </label>
-            <input
-              id="height90"
-              type="number"
-              step="0.1"
-              value={height90Degree}
-              onChange={(e) => {
-                setHeight90Degree(e.target.value);
-                setSelectedMeasurementId("");
-              }}
-              className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., 150, 180, 200"
-            />
-          </div>
-        </div>
 
         <div className="mt-4 md:mt-6 space-y-4">
           <div>
