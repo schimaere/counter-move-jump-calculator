@@ -198,41 +198,65 @@ export default function JumpCalculator() {
           Input Parameters
         </h2>
 
-        <div className="mb-4 md:mb-6 space-y-4">
-          {session?.user?.email && measurements.length > 0 && (
-            <div className="p-3 md:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-              <label
-                htmlFor="measurementSelect"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Load Saved Measurement
+        <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 md:mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Frame Input Mode
               </label>
-              <select
-                id="measurementSelect"
-                value={selectedMeasurementId}
-                onChange={handleMeasurementSelect}
-                className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="">-- Select a measurement --</option>
-                {measurements.map((measurement) => (
-                  <option key={measurement.id} value={measurement.id}>
-                    {measurement.name} (Leg:{" "}
-                    {formatNumber(measurement.leg_length)}cm, Height 90°:{" "}
-                    {formatNumber(measurement.height_90_degree)}cm
-                    {measurement.weight_kg
-                      ? `, Weight: ${formatNumber(measurement.weight_kg)}kg`
-                      : ""}
-                    )
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Selecting a measurement will fill in Leg Length, Height 90°, and
-                Weight (if available)
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Choose how to specify the number of frames
               </p>
             </div>
-          )}
+            <button
+              type="button"
+              onClick={() => {
+                setUseFrameRange(!useFrameRange);
+                // Clear the other mode's fields when switching
+                if (!useFrameRange) {
+                  setAmountOfFrames("");
+                } else {
+                  setStartFrame("");
+                  setEndFrame("");
+                }
+              }}
+              className={`relative inline-flex h-7 w-12 md:h-6 md:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                useFrameRange ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 md:h-4 md:w-4 transform rounded-full bg-white transition-transform ${
+                  useFrameRange
+                    ? "translate-x-6 md:translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span
+              className={
+                useFrameRange
+                  ? "font-semibold text-blue-600 dark:text-blue-400"
+                  : ""
+              }
+            >
+              {useFrameRange ? "✓ Frame Range" : "Frame Range"}
+            </span>
+            <span className="mx-2">•</span>
+            <span
+              className={
+                !useFrameRange
+                  ? "font-semibold text-blue-600 dark:text-blue-400"
+                  : ""
+              }
+            >
+              {!useFrameRange ? "✓ Direct Input" : "Direct Input"}
+            </span>
+          </div>
+        </div>
 
+        <div className="mb-4 md:mb-6">
           <div className="border border-gray-200 dark:border-gray-600 rounded-md overflow-hidden">
             <button
               type="button"
@@ -267,11 +291,47 @@ export default function JumpCalculator() {
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 isAthleteMetricsOpen
-                  ? "max-h-[500px] opacity-100"
+                  ? "max-h-[600px] opacity-100"
                   : "max-h-0 opacity-0"
               }`}
             >
-              <div className="p-4 md:p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600">
+              <div className="p-4 md:p-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600 space-y-4 md:space-y-6">
+                {session?.user?.email && measurements.length > 0 && (
+                  <div className="p-3 md:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                    <label
+                      htmlFor="measurementSelect"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Load Saved Measurement
+                    </label>
+                    <select
+                      id="measurementSelect"
+                      value={selectedMeasurementId}
+                      onChange={handleMeasurementSelect}
+                      className="w-full px-4 py-3 md:py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                      <option value="">-- Select a measurement --</option>
+                      {measurements.map((measurement) => (
+                        <option key={measurement.id} value={measurement.id}>
+                          {measurement.name} (Leg:{" "}
+                          {formatNumber(measurement.leg_length)}cm, Height 90°:{" "}
+                          {formatNumber(measurement.height_90_degree)}cm
+                          {measurement.weight_kg
+                            ? `, Weight: ${formatNumber(
+                                measurement.weight_kg
+                              )}kg`
+                            : ""}
+                          )
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      Selecting a measurement will fill in Leg Length, Height
+                      90°, and Weight (if available)
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label
@@ -341,66 +401,8 @@ export default function JumpCalculator() {
           </div>
         </div>
 
-        <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-md">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 md:mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Frame Input Mode
-              </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Choose how to specify the number of frames
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setUseFrameRange(!useFrameRange);
-                // Clear the other mode's fields when switching
-                if (!useFrameRange) {
-                  setAmountOfFrames("");
-                } else {
-                  setStartFrame("");
-                  setEndFrame("");
-                }
-              }}
-              className={`relative inline-flex h-7 w-12 md:h-6 md:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                useFrameRange ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-5 w-5 md:h-4 md:w-4 transform rounded-full bg-white transition-transform ${
-                  useFrameRange
-                    ? "translate-x-6 md:translate-x-6"
-                    : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            <span
-              className={
-                useFrameRange
-                  ? "font-semibold text-blue-600 dark:text-blue-400"
-                  : ""
-              }
-            >
-              {useFrameRange ? "✓ Frame Range" : "Frame Range"}
-            </span>
-            <span className="mx-2">•</span>
-            <span
-              className={
-                !useFrameRange
-                  ? "font-semibold text-blue-600 dark:text-blue-400"
-                  : ""
-              }
-            >
-              {!useFrameRange ? "✓ Direct Input" : "Direct Input"}
-            </span>
-          </div>
-        </div>
-
         <div
-          className={`grid gap-4 md:gap-6 ${
+          className={`grid gap-4 md:gap-6 mb-4 md:mb-6 ${
             useFrameRange
               ? "grid-cols-1 md:grid-cols-3"
               : "grid-cols-1 md:grid-cols-2"
@@ -512,38 +514,20 @@ export default function JumpCalculator() {
         )}
 
         <div className="mt-4 md:mt-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Time in Flight
-            </label>
-            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
-              {results ? (
-                <>
-                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                    {formatNumber(results.timeInFlightMs)} ms
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    (frames ÷ fps)
-                  </p>
-                </>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Enter Frames per Second and Amount of Frames
-                </p>
-              )}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="p-4 md:p-5 bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-800 rounded-lg shadow-lg">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Jump Height
             </label>
-            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+            <div className="w-full px-4 py-6 md:py-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
               {results ? (
                 <>
-                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                    {formatNumber(results.jumpHeight)} cm
+                  <p className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-none tracking-tight">
+                    {formatNumber(results.jumpHeight)}{" "}
+                    <span className="text-xl md:text-2xl font-semibold">
+                      cm
+                    </span>
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                     (calculated from time in flight)
                   </p>
                 </>
@@ -554,69 +538,88 @@ export default function JumpCalculator() {
               )}
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Takeoff Velocity
-            </label>
-            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
-              {results ? (
-                <>
-                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                    {formatNumber(results.takeoffVelocity)} m/s
+
+          <div className="p-4 md:p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+              Additional Metrics
+            </h3>
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
+              <div className="px-3 py-3 md:py-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  Time in Flight
+                </label>
+                {results ? (
+                  <>
+                    <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                      {formatNumber(results.timeInFlightMs)}{" "}
+                      <span className="text-base md:text-lg font-semibold">
+                        ms
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Enter data
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    (calculated from time in flight)
+                )}
+              </div>
+
+              <div className="px-3 py-3 md:py-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  Takeoff Velocity
+                </label>
+                {results ? (
+                  <>
+                    <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                      {formatNumber(results.takeoffVelocity)}{" "}
+                      <span className="text-base md:text-lg font-semibold">
+                        m/s
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Enter data
                   </p>
-                </>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Enter Frames per Second and Amount of Frames
-                </p>
-              )}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Average Force (Fm)
-            </label>
-            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
-              {results && results.averageForce !== null ? (
-                <>
-                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                    {formatNumber(results.averageForce)} N
+                )}
+              </div>
+
+              <div className="px-3 py-3 md:py-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  Average Force (Fm)
+                </label>
+                {results && results.averageForce !== null ? (
+                  <>
+                    <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                      {formatNumber(results.averageForce)}{" "}
+                      <span className="text-base md:text-lg font-semibold">
+                        N
+                      </span>
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Enter metrics
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    (calculated from body weight, takeoff velocity, leg length,
-                    and hip height at 90 degrees)
+                )}
+              </div>
+
+              <div className="px-3 py-3 md:py-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  Relative Force (Frel)
+                </label>
+                {results && results.relativeForce !== null ? (
+                  <>
+                    <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                      {formatNumber(results.relativeForce, 3)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Enter metrics
                   </p>
-                </>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Enter Body Weight, Leg Length, and Height 90° to calculate
-                </p>
-              )}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Relative Force (Frel)
-            </label>
-            <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
-              {results && results.relativeForce !== null ? (
-                <>
-                  <p className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                    {formatNumber(results.relativeForce, 3)}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    (average force divided by body weight × 9.81, multiple of
-                    body weight)
-                  </p>
-                </>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Enter Body Weight, Leg Length, and Height 90° to calculate
-                </p>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
